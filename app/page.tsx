@@ -1,69 +1,107 @@
-import Image from "next/image";
+'use client';
+import React, { useState } from 'react';
 
-export default function Home() {
+export default function ChamberLogin({ onLoginSuccess }) {
+  const [email, setEmail] = useState('');
+  const [password, setPassword] = useState('');
+  const [role, setRole] = useState('associate'); // Default demo toggle
+
+  const handleLogin = (e: React.FormEvent) => {
+    e.preventDefault();
+    window.location.href = '/dashboard';
+  };
+
   return (
-    <div className="flex flex-col flex-1 items-center justify-center bg-zinc-50 font-sans dark:bg-black">
-      <main className="flex flex-1 w-full max-w-3xl flex-col items-center justify-between py-32 px-16 bg-white dark:bg-black sm:items-start">
-        <Image
-          className="dark:invert h-5 w-[100px]"
-          src="/next.svg"
-          alt="Next.js logo"
-          width={100}
-          height={20}
-          priority
-        />
-        <div className="flex flex-col items-center gap-6 text-center sm:items-start sm:text-left">
-          <h1 className="max-w-xs text-3xl font-semibold leading-10 tracking-tight text-black dark:text-zinc-50">
-            To get started, edit the{" "}
-            <code className="rounded bg-black/[.06] px-1.5 py-0.5 font-mono text-[0.9em] dark:bg-white/[.08]">
-              page.tsx
-            </code>{" "}
-            file.
+    <div className="min-h-screen bg-black text-white flex flex-col justify-between p-8 font-sans">
+      {/* Top Header */}
+      <div className="flex justify-between items-center text-xs tracking-widest text-neutral-400 uppercase">
+        <span>Chamber Portal</span>
+        <span className="border border-neutral-700 px-3 py-1">Restricted Access</span>
+      </div>
+
+      {/* Main Split Layout */}
+      <div className="max-w-5xl mx-auto w-full grid grid-cols-1 md:grid-cols-2 gap-12 items-center my-12">
+        {/* Chamber Information */}
+        <div className="space-y-6">
+          <span className="inline-block border border-neutral-800 text-neutral-400 text-xs px-3 py-1 uppercase tracking-wider">
+            CHAMBER NAME 
+          </span>
+          <h1 className="text-4xl font-bold tracking-tight leading-tight">
+            Lister AI - <br /> Extract. Arrange. Assign.
           </h1>
-          <p className="max-w-md text-lg leading-8 text-zinc-600 dark:text-zinc-400">
-            Looking for a starting point or more instructions? Head over to{" "}
-            <a
-              href="https://vercel.com/templates?framework=next.js&utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Templates
-            </a>{" "}
-            or the{" "}
-            <a
-              href="https://nextjs.org/learn?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-              className="font-medium text-zinc-950 dark:text-zinc-50"
-            >
-              Learning
-            </a>{" "}
-            center.
+          <p className="text-neutral-400 text-sm leading-relaxed max-w-md">
+            Restricted to designated advocates, associates, and chamber clerks. Unauthorized entry or data extraction is prohibited under chamber security protocol.
           </p>
         </div>
-        <div className="flex flex-col gap-4 text-base font-medium sm:flex-row">
-          <a
-            className="flex h-12 w-full items-center justify-center gap-2 rounded-full bg-foreground px-5 text-background transition-colors hover:bg-[#383838] dark:hover:bg-[#ccc] md:w-[158px]"
-            href="https://vercel.com/new?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            <Image
-              className="dark:invert h-[14px] w-4"
-              src="/vercel.svg"
-              alt="Vercel logomark"
-              width={16}
-              height={14}
-            />
-            Deploy Now
-          </a>
-          <a
-            className="flex h-12 w-full items-center justify-center rounded-full border border-solid border-black/[.08] px-5 transition-colors hover:border-transparent hover:bg-black/[.04] dark:border-white/[.145] dark:hover:bg-[#1a1a1a] md:w-[158px]"
-            href="https://nextjs.org/docs?utm_source=create-next-app&utm_medium=appdir-template-tw&utm_campaign=create-next-app"
-            target="_blank"
-            rel="noopener noreferrer"
-          >
-            Documentation
-          </a>
+
+        {/* Auth Box */}
+        <div className="border border-neutral-800 bg-[#080808] p-8 rounded-none max-w-md w-full mx-auto">
+          <h2 className="text-xl font-bold mb-1">Staff Authentication</h2>
+          <p className="text-xs text-neutral-500 mb-6">Enter assigned chamber credentials</p>
+
+          <form onSubmit={handleLogin} className="space-y-4">
+            <div>
+              <label className="text-xs text-neutral-400 uppercase tracking-wider block mb-1">
+                Chamber Email / Identifier
+              </label>
+              <input
+                type="email"
+                required
+                value={email}
+                onChange={(e) => setEmail(e.target.value)}
+                placeholder="test@test.com"
+                className="w-full bg-black border border-neutral-700 text-white p-2.5 text-sm focus:border-white focus:outline-none"
+              />
+            </div>
+
+            <div>
+              <label className="text-xs text-neutral-400 uppercase tracking-wider block mb-1">
+                Password
+              </label>
+              <input
+                type="password"
+                required
+                value={password}
+                onChange={(e) => setPassword(e.target.value)}
+                placeholder="test123"
+                className="w-full bg-black border border-neutral-700 text-white p-2.5 text-sm focus:border-white focus:outline-none"
+              />
+            </div>
+
+            {/* Role Switcher (For Judges / Live Demo Testing) */}
+            <div className="pt-2">
+              <label className="text-xs text-neutral-500 uppercase tracking-wider block mb-1">
+                Simulated Permission Tier
+              </label>
+              <select
+                value={role}
+                onChange={(e) => setRole(e.target.value)}
+                className="w-full bg-black border border-neutral-700 text-xs text-neutral-300 p-2 focus:border-white focus:outline-none"
+              >
+                <option value="super_admin">Super Admin (Head of Chamber - Master Key)</option>
+                <option value="associate">Associate Counsel (Limited Case Actions)</option>
+                <option value="clerk">Court Clerk / Munshi (Logistics Only)</option>
+              </select>
+            </div>
+
+            <button
+              type="submit"
+              className="w-full mt-4 bg-white text-black font-semibold py-2.5 text-sm hover:bg-neutral-200 transition-colors uppercase tracking-wider"
+            >
+              Authenticate & Enter
+            </button>
+          </form>
+
+          <p className="text-[11px] text-neutral-600 mt-6 text-center">
+            Lost access credentials? Contact the Chamber Lead Counsel.
+          </p>
         </div>
-      </main>
+      </div>
+
+      {/* Footer */}
+      <div className="text-center text-xs text-neutral-600 border-t border-neutral-900 pt-4">
+        Indian Courts Case Register · Supreme Court, High Courts & District Tribunals
+      </div>
     </div>
   );
 }

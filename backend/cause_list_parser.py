@@ -1,0 +1,129 @@
+import pdfplumber
+import json
+import os
+import re
+from datetime import datetime
+from playwright.sync_api import sync_playwright
+
+CHAMBER_ADVOCATES = ["GAURAV MOHUNTA", "AKSHAY BHAN", "ASHISH KAPOOR"]
+TARGET_PDF = "daily_causelist.pdf"
+ROSTER_MAP = {} 
+
+def fetch_docket_and_roster():
+    print("Initializing browser automation...")
+    
+    with sync_playwright() as p:
+        browser = p.chromium.launch(headless=True) 
+        context = browser.new_context(accept_downloads=True)
+        page = context.new_page()
+        
+        try:
+            # --- PHASE 1: SCRAPE THE ROSTER ---
+            print("Scraping live roster mapping...")
+            page.goto("https://highcourtchd.gov.in/?mod=chief")
+            page.wait_for_load_state("networkidle")
+            
+            # Extract raw digits and match them to the second and third columns
+            rows = page.locator("tr").all()
+            for row in rows:
+                tds = row.locator("td").all()
+                if len(tds) >= 3:
+                    judge_text = tds[1].inner_text().strip().upper()
+                    cr_text = tds[2].inner_text().strip()
+                    
+                    cr_match = re.search(r'(\d+)', cr_text)
+                    if cr_match:
+                        cr_num = cr_match.group(1)
+                        ROSTER_MAP[cr_num] = judge_text
+
+            # --- PHASE 2: FETCH THE PDF ---
+            print("Fetching today's docket...")
+            page.goto("https://highcourtchd.gov.in/?mod=causelist") 
+            page.wait_for_load_state("networkidle")
+            
+            today_date = datetime.today().strftime('%m/%d/%Y')
+            page.locator("input[type='text']").first.fill(today_date)
+            page.locator("select").first.select_option(label="Complete List")
+            page.get_by_role("button", name="View CL").click()
+            page.wait_for_timeout(2000)
+            
+            print("Intercepting PDF download...")
+            with page.expect_download(timeout=15000) as download_info:
+                page.locator(f"a:has-text('{today_date}')").first.click()
+            download_info.value.save_as(TARGET_PDF)
+            
+        except Exception as e:
+            print(f"Automation failed: {e}")
+        finally:
+            browser.close()
+
+def parse_and_filter_docket():
+    if not os.path.exists(TARGET_PDF):
+        return
+
+    extracted_matters = []
+    current_court_num = ""
+    current_vc_link = ""
+    active_item = ""
+    active_case = ""
+    active_advocates_found = set()
+    
+    # Updated regex: Captures ONLY the digits following CR NO or COURT NO
+    court_pattern = re.compile(r'(?:C\.?R\.?\s*NO\.?|COURT\s*NO\.?|COURT\s*ROOM\s*NO\.?)\s*(\d+)')
+    vc_pattern = re.compile(r'(https?://[^\s]+)')
+    item_start_pattern = re.compile(r'^\s*(\d+[\*]*)\s+')
+    case_no_pattern = re.compile(r'([A-Za-z]+-\d+-\d{4})')
+
+    with pdfplumber.open(TARGET_PDF) as pdf:
+        for page in pdf.pages:
+            text = page.extract_text(layout=True)
+            if not text:
+                continue
+            
+            for line in text.split('\n'):
+                upper_line = line.upper()
+                
+                # Extract pure numbers from the PDF headers
+                court_match = court_pattern.search(upper_line)
+                if court_match:
+                    current_court_num = court_match.group(1).strip()
+                    
+                vc_match = vc_pattern.search(line)
+                if vc_match:
+                    current_vc_link = vc_match.group(1).strip()
+                    
+                item_match = item_start_pattern.search(line)
+                case_match = case_no_pattern.search(line)
+                
+                if item_match and case_match:
+                    active_item = item_match.group(1).replace('*', '')
+                    active_case = case_match.group(1)
+                    active_advocates_found = set()
+                    
+                if active_case:
+                    for adv in CHAMBER_ADVOCATES:
+                        if adv not in active_advocates_found and re.search(r'\b' + re.escape(adv) + r'\b', upper_line):
+                            active_advocates_found.add(adv)
+                            
+                            # Lookup by exact digits
+                            verified_judge = ROSTER_MAP.get(current_court_num, "Judge TBD (Awaiting Roster)")
+                            court_display = f"CR NO {current_court_num}" if current_court_num else "Court Details Pending"
+                            
+                            extracted_matters.append({
+                                "advocate_matched": adv.title(),
+                                "item_no": active_item,
+                                "case_no": active_case,
+                                "judge": f"{court_display} - {verified_judge}",
+                                "vc_link": current_vc_link,
+                                "status": "Pending Assignment",
+                                "date": datetime.today().strftime('%Y-%m-%d')
+                            })
+                                
+    output_path = "app/dashboard/chamber_matters.json"
+    os.makedirs(os.path.dirname(output_path), exist_ok=True)
+    with open(output_path, "w") as outfile:
+        json.dump(extracted_matters, outfile, indent=4)
+
+if __name__ == "__main__":
+    fetch_docket_and_roster()
+    parse_and_filter_docket()
