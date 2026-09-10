@@ -1,7 +1,7 @@
 'use client';
 import React, { useState } from 'react';
 
-export default function ChamberLogin({ onLoginSuccess }) {
+export default function ChamberLogin({ onLoginSuccess }: { onLoginSuccess?: () => void }) {
   const [email, setEmail] = useState('');
   const [password, setPassword] = useState('');
   const [role, setRole] = useState('associate'); // Default demo toggle
