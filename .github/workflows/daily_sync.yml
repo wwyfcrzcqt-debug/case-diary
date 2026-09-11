@@ -36,4 +36,5 @@ jobs:
           git add app/dashboard/chamber_matters.json
           # Prevents the pipeline from crashing if the court hasn't updated the list yet
           git commit -m "chore: daily automated docket sync" || echo "No changes to commit"
+          git pull --rebase orgin main
           git push
