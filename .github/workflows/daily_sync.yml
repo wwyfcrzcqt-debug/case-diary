@@ -32,12 +32,11 @@ jobs:
       - name: Run Scraper
         run: python3 backend/cause_list_parser.py
         
-      - name: Commit and Push Updated JSON
+        - name: Commit and Push Updated JSON
         run: |
           git config --global user.name "GitHub Actions Bot"
           git config --global user.email "actions@github.com"
           git add app/dashboard/chamber_matters.json
-          # Prevents the pipeline from crashing if the court hasn't updated the list yet
           git commit -m "chore: daily automated docket sync" || echo "No changes to commit"
           git pull --rebase origin main
-          git push origin main
+          git push origin HEAD:main
