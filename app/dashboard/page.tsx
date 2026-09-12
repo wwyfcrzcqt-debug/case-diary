@@ -1,13 +1,26 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
-import extractedMatters from './chamber_matters.json';
+import extractedMattersJson from './chamber_matters.json';
+
+// Explicitly defines the data structure to prevent TypeScript 'never' errors on empty arrays
+type Matter = {
+  advocate_matched: string;
+  item_no: string;
+  case_no: string;
+  judge: string;
+  vc_link: string;
+  status: string;
+  date: string;
+};
+
+const extractedMatters = extractedMattersJson as Matter[];
 
 export default function Dashboard() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState('');
+  const [isWeekend, setIsWeekend] = useState(false);
 
-  // Generates real-time clock and prevents Next.js hydration mismatch
   useEffect(() => {
     const updateTime = () => {
       const now = new Date();
@@ -15,6 +28,8 @@ export default function Dashboard() {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
         hour: '2-digit', minute: '2-digit'
       }));
+      // 0 is Sunday, 6 is Saturday
+      setIsWeekend(now.getDay() === 0 || now.getDay() === 6);
     };
     updateTime();
     const interval = setInterval(updateTime, 60000);
@@ -91,8 +106,8 @@ export default function Dashboard() {
           <h2 className="hidden print:block text-lg font-bold mb-4 border-b border-black pb-2">Daily Cause List</h2>
 
           <div className="w-full border border-neutral-800 bg-[#080808] p-4 print:bg-white print:border-black print:p-0">
-            {extractedMatters.length === 0 ? (
-              <div className="w-full text-center py-12 text-sm text-neutral-500">
+            {isWeekend || extractedMatters.length === 0 ? (
+              <div className="w-full text-center py-12 text-sm text-neutral-500 font-medium tracking-wide">
                 No cases listed for today or tomorrow.
               </div>
             ) : (
