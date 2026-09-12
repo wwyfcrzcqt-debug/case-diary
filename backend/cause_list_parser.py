@@ -2,12 +2,20 @@ import pdfplumber
 import json
 import os
 import re
-from datetime import datetime
+from datetime import datetime, timedelta
 from playwright.sync_api import sync_playwright
 
 CHAMBER_ADVOCATES = ["GAURAV MOHUNTA", "AKSHAY BHAN", "ASHISH KAPOOR"]
 TARGET_PDF = "daily_causelist.pdf"
 ROSTER_MAP = {} 
+
+# Automatically calculates the next working day
+def get_target_date():
+    now = datetime.today()
+    # If today is Friday (weekday 4), add 3 days to skip the weekend and target Monday.
+    # Otherwise, just add 1 day to target tomorrow.
+    days_to_add = 3 if now.weekday() == 4 else 1
+    return now + timedelta(days=days_to_add)
 
 def fetch_docket_and_roster():
     print("Initializing browser automation...")
@@ -37,19 +45,21 @@ def fetch_docket_and_roster():
                         ROSTER_MAP[cr_num] = judge_text
 
             # --- PHASE 2: FETCH THE PDF ---
-            print("Fetching today's docket...")
+            print("Fetching target docket...")
             page.goto("https://highcourtchd.gov.in/?mod=causelist") 
             page.wait_for_load_state("networkidle")
             
-            today_date = datetime.today().strftime('%m/%d/%Y')
-            page.locator("input[type='text']").first.fill(today_date)
+            # Formats the target date for the High Court input field
+            target_date_str = get_target_date().strftime('%m/%d/%Y')
+            
+            page.locator("input[type='text']").first.fill(target_date_str)
             page.locator("select").first.select_option(label="Complete List")
             page.get_by_role("button", name="View CL").click()
             page.wait_for_timeout(2000)
             
             print("Intercepting PDF download...")
             with page.expect_download(timeout=15000) as download_info:
-                page.locator(f"a:has-text('{today_date}')").first.click()
+                page.locator(f"a:has-text('{target_date_str}')").first.click()
             download_info.value.save_as(TARGET_PDF)
             
         except Exception as e:
@@ -116,7 +126,8 @@ def parse_and_filter_docket():
                                 "judge": f"{court_display} - {verified_judge}",
                                 "vc_link": current_vc_link,
                                 "status": "Pending Assignment",
-                                "date": datetime.today().strftime('%Y-%m-%d')
+                                # Formats the JSON date output as YYYY-MM-DD
+                                "date": get_target_date().strftime('%Y-%m-%d')
                             })
                                 
     output_path = "app/dashboard/chamber_matters.json"
