@@ -40,7 +40,7 @@ def fetch_docket_and_roster():
         try:
             print("Scraping live roster mapping...")
             # wait_until="domcontentloaded" forces it to stop waiting for broken background images
-            page.goto("https://highcourtchd.gov.in/?mod=chief", wait_until="domcontentloaded", timeout=60000)
+            page.goto("https://highcourtchd.gov.in/?mod=causelist", wait_until="domcontentloaded", timeout=60000)
             
             rows = page.locator("tr").all()
             for row in rows:
