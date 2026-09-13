@@ -88,7 +88,7 @@ def parse_and_filter_docket():
     active_advocates_found = set()
     
     court_pattern = re.compile(r'(?:C\.?R\.?\s*NO\.?|COURT\s*NO\.?|COURT\s*ROOM\s*NO\.?)\s*(\d+)')
-    vc_pattern = re.compile(r'(https?://[^\s]+)')
+    vc_pattern = re.compile(r'(https?://[^\s]*(?:zoom|webex|meet|highcourt)[^\s]*)', re.IGNORECASE)
     item_start_pattern = re.compile(r'^\s*(\d+[\*]*)\s+')
     case_no_pattern = re.compile(r'([A-Za-z]+-\d+-\d{4})')
 
