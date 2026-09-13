@@ -9,13 +9,10 @@ CHAMBER_ADVOCATES = ["GAURAV MOHUNTA", "AKSHAY BHAN", "ASHISH KAPOOR"]
 TARGET_PDF = "daily_causelist.pdf"
 ROSTER_MAP = {} 
 
-# Automatically calculates the next working day in IST
 def get_target_date():
-    # Force Indian Standard Time (UTC + 5:30) to prevent GitHub UTC server mismatch
     ist = timezone(timedelta(hours=5, minutes=30))
     now = datetime.now(ist)
     
-    # 4=Friday, 5=Saturday, 6=Sunday
     if now.weekday() == 4:
         days_to_add = 3
     elif now.weekday() == 5:
@@ -28,19 +25,22 @@ def get_target_date():
 def fetch_docket_and_roster():
     print("Initializing browser automation...")
     
-    # Destroy any cached PDF to prevent silent failure loop
     if os.path.exists(TARGET_PDF):
         os.remove(TARGET_PDF)
         
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True) 
-        context = browser.new_context(accept_downloads=True)
+        # Spoof a real Windows machine to bypass basic anti-bot filters
+        context = browser.new_context(
+            accept_downloads=True,
+            user_agent="Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36"
+        )
         page = context.new_page()
         
         try:
             print("Scraping live roster mapping...")
-            page.goto("https://highcourtchd.gov.in/?mod=chief", timeout=60000)
-            page.wait_for_load_state("networkidle")
+            # wait_until="domcontentloaded" forces it to stop waiting for broken background images
+            page.goto("https://highcourtchd.gov.in/?mod=chief", wait_until="domcontentloaded", timeout=60000)
             
             rows = page.locator("tr").all()
             for row in rows:
@@ -55,10 +55,8 @@ def fetch_docket_and_roster():
                         ROSTER_MAP[cr_num] = judge_text
 
             print("Fetching target docket...")
-            page.goto("https://highcourtchd.gov.in/?mod=causelist", timeout=60000) 
-            page.wait_for_load_state("networkidle")
+            page.goto("https://highcourtchd.gov.in/?mod=causelist", wait_until="domcontentloaded", timeout=60000) 
             
-            # FIXED: Enforce Indian DD/MM/YYYY date format
             target_date_str = get_target_date().strftime('%d/%m/%Y')
             print(f"Targeting exact date: {target_date_str}")
             
@@ -74,7 +72,7 @@ def fetch_docket_and_roster():
             
         except Exception as e:
             print(f"CRITICAL ERROR - Automation failed to find target date: {e}")
-            raise e # Force the pipeline to explicitly fail instead of generating stale data
+            raise e 
         finally:
             browser.close()
 
