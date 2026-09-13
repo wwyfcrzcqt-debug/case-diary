@@ -2,36 +2,46 @@ import pdfplumber
 import json
 import os
 import re
-from datetime import datetime, timedelta
+from datetime import datetime, timedelta, timezone
 from playwright.sync_api import sync_playwright
 
 CHAMBER_ADVOCATES = ["GAURAV MOHUNTA", "AKSHAY BHAN", "ASHISH KAPOOR"]
 TARGET_PDF = "daily_causelist.pdf"
 ROSTER_MAP = {} 
 
-# Automatically calculates the next working day
+# Automatically calculates the next working day in IST
 def get_target_date():
-    now = datetime.today()
-    # If today is Friday (weekday 4), add 3 days to skip the weekend and target Monday.
-    # Otherwise, just add 1 day to target tomorrow.
-    days_to_add = 3 if now.weekday() == 4 else 1
+    # Force Indian Standard Time (UTC + 5:30) to prevent GitHub UTC server mismatch
+    ist = timezone(timedelta(hours=5, minutes=30))
+    now = datetime.now(ist)
+    
+    # 4=Friday, 5=Saturday, 6=Sunday
+    if now.weekday() == 4:
+        days_to_add = 3
+    elif now.weekday() == 5:
+        days_to_add = 2
+    else:
+        days_to_add = 1
+        
     return now + timedelta(days=days_to_add)
 
 def fetch_docket_and_roster():
     print("Initializing browser automation...")
     
+    # Destroy any cached PDF to prevent silent failure loop
+    if os.path.exists(TARGET_PDF):
+        os.remove(TARGET_PDF)
+        
     with sync_playwright() as p:
         browser = p.chromium.launch(headless=True) 
         context = browser.new_context(accept_downloads=True)
         page = context.new_page()
         
         try:
-            # --- PHASE 1: SCRAPE THE ROSTER ---
             print("Scraping live roster mapping...")
-            page.goto("https://highcourtchd.gov.in/?mod=chief")
+            page.goto("https://highcourtchd.gov.in/?mod=chief", timeout=60000)
             page.wait_for_load_state("networkidle")
             
-            # Extract raw digits and match them to the second and third columns
             rows = page.locator("tr").all()
             for row in rows:
                 tds = row.locator("td").all()
@@ -44,13 +54,13 @@ def fetch_docket_and_roster():
                         cr_num = cr_match.group(1)
                         ROSTER_MAP[cr_num] = judge_text
 
-            # --- PHASE 2: FETCH THE PDF ---
             print("Fetching target docket...")
-            page.goto("https://highcourtchd.gov.in/?mod=causelist") 
+            page.goto("https://highcourtchd.gov.in/?mod=causelist", timeout=60000) 
             page.wait_for_load_state("networkidle")
             
-            # Formats the target date for the High Court input field
-            target_date_str = get_target_date().strftime('%m/%d/%Y')
+            # FIXED: Enforce Indian DD/MM/YYYY date format
+            target_date_str = get_target_date().strftime('%d/%m/%Y')
+            print(f"Targeting exact date: {target_date_str}")
             
             page.locator("input[type='text']").first.fill(target_date_str)
             page.locator("select").first.select_option(label="Complete List")
@@ -63,7 +73,8 @@ def fetch_docket_and_roster():
             download_info.value.save_as(TARGET_PDF)
             
         except Exception as e:
-            print(f"Automation failed: {e}")
+            print(f"CRITICAL ERROR - Automation failed to find target date: {e}")
+            raise e # Force the pipeline to explicitly fail instead of generating stale data
         finally:
             browser.close()
 
@@ -78,7 +89,6 @@ def parse_and_filter_docket():
     active_case = ""
     active_advocates_found = set()
     
-    # Updated regex: Captures ONLY the digits following CR NO or COURT NO
     court_pattern = re.compile(r'(?:C\.?R\.?\s*NO\.?|COURT\s*NO\.?|COURT\s*ROOM\s*NO\.?)\s*(\d+)')
     vc_pattern = re.compile(r'(https?://[^\s]+)')
     item_start_pattern = re.compile(r'^\s*(\d+[\*]*)\s+')
@@ -93,7 +103,6 @@ def parse_and_filter_docket():
             for line in text.split('\n'):
                 upper_line = line.upper()
                 
-                # Extract pure numbers from the PDF headers
                 court_match = court_pattern.search(upper_line)
                 if court_match:
                     current_court_num = court_match.group(1).strip()
@@ -115,7 +124,6 @@ def parse_and_filter_docket():
                         if adv not in active_advocates_found and re.search(r'\b' + re.escape(adv) + r'\b', upper_line):
                             active_advocates_found.add(adv)
                             
-                            # Lookup by exact digits
                             verified_judge = ROSTER_MAP.get(current_court_num, "Judge TBD (Awaiting Roster)")
                             court_display = f"CR NO {current_court_num}" if current_court_num else "Court Details Pending"
                             
@@ -126,7 +134,6 @@ def parse_and_filter_docket():
                                 "judge": f"{court_display} - {verified_judge}",
                                 "vc_link": current_vc_link,
                                 "status": "Pending Assignment",
-                                # Formats the JSON date output as YYYY-MM-DD
                                 "date": get_target_date().strftime('%Y-%m-%d')
                             })
                                 
