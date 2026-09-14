@@ -24,8 +24,9 @@ export default function Login() {
             <div className="inline-block border border-neutral-800 px-3 py-1 text-[10px] tracking-widest text-neutral-500 uppercase font-semibold">
               Chamber Name
             </div>
-            <h1 className="text-4xl md:text-5xl font-bold tracking-tight leading-tight">
-              Lister AI -<br />Extract. Arrange. Assign.
+            <h1 className="text-4xl md:text-4xl lg:text-5xl font-bold tracking-tight leading-tight">
+              Lister AI -<br />
+              <span className="whitespace-nowrap">Extract. Arrange. Assign.</span>
             </h1>
             <p className="text-neutral-500 text-xs leading-relaxed max-w-sm mt-4">
               Restricted to designated advocates, associates, and chamber clerks. Unauthorized entry or data extraction is prohibited under chamber security protocol.
