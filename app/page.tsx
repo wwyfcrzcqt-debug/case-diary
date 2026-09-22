@@ -1,7 +1,10 @@
 'use client';
+import { useState } from 'react';
 import Link from 'next/link';
 
 export default function Login() {
+  const [role, setRole] = useState('associate');
+
   return (
     <div className="min-h-screen bg-black text-white flex flex-col font-sans selection:bg-neutral-800">
       
@@ -56,22 +59,25 @@ export default function Login() {
                   className="w-full bg-black border border-neutral-800 text-neutral-300 p-3 text-sm focus:border-neutral-500 focus:outline-none transition-colors" 
                 />
                 <div className="absolute right-3 top-[28px] text-neutral-500 cursor-pointer hover:text-white transition-colors">
-                  {/* Eye Icon */}
                   <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" strokeWidth="2" strokeLinecap="round" strokeLinejoin="round"><path d="M2 12s3-7 10-7 10 7 10 7-3 7-10 7-10-7-10-7Z"/><circle cx="12" cy="12" r="3"/></svg>
                 </div>
               </div>
 
               <div className="space-y-2 pt-2">
                 <label className="text-[10px] uppercase tracking-wider text-neutral-500 font-semibold">Simulated Permission Tier</label>
-                <select className="w-full bg-black border border-neutral-800 text-neutral-300 p-3 text-xs focus:border-neutral-500 focus:outline-none transition-colors appearance-none cursor-pointer">
-                  <option>Associate Counsel (Limited Case Actions)</option>
-                  <option>Lead Counsel (Full Access)</option>
-                  <option>Super Admin</option>
+                <select 
+                  value={role}
+                  onChange={(e) => setRole(e.target.value)}
+                  className="w-full bg-black border border-neutral-800 text-neutral-300 p-3 text-xs focus:border-neutral-500 focus:outline-none transition-colors appearance-none cursor-pointer"
+                >
+                  <option value="associate">Associate Counsel (Limited Case Actions)</option>
+                  <option value="lead">Lead Counsel (Full Access)</option>
+                  <option value="admin">Super Admin</option>
                 </select>
               </div>
 
               <Link 
-                href="/dashboard" 
+                href={`/dashboard?role=${role}`}
                 className="block w-full text-center bg-white text-black font-bold px-4 py-3 hover:bg-neutral-200 transition-colors uppercase tracking-widest text-[11px] mt-6"
               >
                 Authenticate & Enter
