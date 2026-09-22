@@ -2,6 +2,7 @@
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
+import dynamic from 'next/dynamic';
 import extractedMattersJson from './chamber_matters.json';
 
 type Matter = {
@@ -16,13 +17,12 @@ type Matter = {
 
 const extractedMatters = extractedMattersJson as Matter[];
 
-export default function Dashboard() {
+function DashboardContent() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState('');
   
-  // 1. Read the permission tier from the URL (e.g., ?role=admin)
   const searchParams = useSearchParams();
-  const role = searchParams.get('role') || 'associate'; // Defaults to associate if URL is empty
+  const role = searchParams.get('role') || 'associate';
 
   useEffect(() => {
     const updateTime = () => {
@@ -42,7 +42,6 @@ export default function Dashboard() {
   };
 
   const handleSync = async () => {
-    // 2. Hard block to prevent Associates from triggering a server sync
     if (role === 'associate') {
       alert("Permission Denied: Only Admins or Lead Counsel can trigger a live server sync.");
       return;
@@ -83,7 +82,6 @@ export default function Dashboard() {
             >
               ← Log Out
             </Link>
-            {/* 3. Dynamically display the current role badge */}
             <div className={`text-xs tracking-widest uppercase border px-3 py-1 bg-[#080808] print:bg-white print:border-black print:text-black ${
               role === 'admin' ? 'border-red-900 text-red-500' : 
               role === 'lead' ? 'border-blue-900 text-blue-500' : 
@@ -102,7 +100,6 @@ export default function Dashboard() {
                 Export Printable Docket
               </button>
               
-              {/* 4. Completely hide the Sync button if the user is an Associate */}
               {role !== 'associate' && (
                 <button 
                   onClick={handleSync} 
@@ -156,7 +153,6 @@ export default function Dashboard() {
                         )}
                       </td>
                       <td className="p-4 align-top print:p-2">
-                        {/* 5. Disable the Assignment dropdown if the user is an Associate */}
                         <select 
                           defaultValue={matter.advocate_matched}
                           disabled={role === 'associate'}
@@ -181,7 +177,6 @@ export default function Dashboard() {
                         </select>
                       </td>
                       <td className="p-4 align-top print:p-2">
-                        {/* 6. Disable the Instruction notes field if the user is an Associate */}
                         <input 
                           type="text" 
                           placeholder="Add note..." 
@@ -202,3 +197,6 @@ export default function Dashboard() {
     </div>
   );
 }
+
+// Disable SSR completely to safely bypass Vercel prerender errors
+export default dynamic(() => Promise.resolve(DashboardContent), { ssr: false });
