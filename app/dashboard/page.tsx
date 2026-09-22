@@ -1,9 +1,9 @@
 'use client';
 import React, { useState, useEffect } from 'react';
 import Link from 'next/link';
+import { useSearchParams } from 'next/navigation';
 import extractedMattersJson from './chamber_matters.json';
 
-// Explicitly defines the data structure to prevent TypeScript 'never' errors on empty arrays
 type Matter = {
   advocate_matched: string;
   item_no: string;
@@ -19,7 +19,10 @@ const extractedMatters = extractedMattersJson as Matter[];
 export default function Dashboard() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState('');
-  const [isWeekend, setIsWeekend] = useState(false);
+  
+  // 1. Read the permission tier from the URL (e.g., ?role=admin)
+  const searchParams = useSearchParams();
+  const role = searchParams.get('role') || 'associate'; // Defaults to associate if URL is empty
 
   useEffect(() => {
     const updateTime = () => {
@@ -28,8 +31,6 @@ export default function Dashboard() {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
         hour: '2-digit', minute: '2-digit'
       }));
-      // 0 is Sunday, 6 is Saturday
-      setIsWeekend(now.getDay() === 0 || now.getDay() === 6);
     };
     updateTime();
     const interval = setInterval(updateTime, 60000);
@@ -41,12 +42,16 @@ export default function Dashboard() {
   };
 
   const handleSync = async () => {
-    setIsSyncing(true);
+    // 2. Hard block to prevent Associates from triggering a server sync
+    if (role === 'associate') {
+      alert("Permission Denied: Only Admins or Lead Counsel can trigger a live server sync.");
+      return;
+    }
     
+    setIsSyncing(true);
     try {
       const res = await fetch('/api/sync', { method: 'POST' });
       const data = await res.json();
-      
       if (data.success) {
         window.location.reload(); 
       } else {
@@ -78,8 +83,13 @@ export default function Dashboard() {
             >
               ← Log Out
             </Link>
-            <div className="text-xs tracking-widest text-neutral-400 uppercase border border-neutral-700 px-3 py-1 bg-[#080808] print:bg-white print:border-black print:text-black">
-              Super Admin Active
+            {/* 3. Dynamically display the current role badge */}
+            <div className={`text-xs tracking-widest uppercase border px-3 py-1 bg-[#080808] print:bg-white print:border-black print:text-black ${
+              role === 'admin' ? 'border-red-900 text-red-500' : 
+              role === 'lead' ? 'border-blue-900 text-blue-500' : 
+              'border-neutral-700 text-neutral-400'
+            }`}>
+              {role === 'admin' ? 'Super Admin Active' : role === 'lead' ? 'Lead Counsel Active' : 'Associate View Only'}
             </div>
           </div>
         </header>
@@ -91,22 +101,26 @@ export default function Dashboard() {
               <button onClick={handleExport} className="text-xs bg-white text-black font-semibold px-4 py-2 hover:bg-neutral-200 transition-colors uppercase tracking-wider">
                 Export Printable Docket
               </button>
-              <button 
-                onClick={handleSync} 
-                disabled={isSyncing}
-                className={`text-xs border border-neutral-700 px-4 py-2 uppercase tracking-wider transition-colors ${
-                  isSyncing ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' : 'hover:bg-white hover:text-black'
-                }`}
-              >
-                {isSyncing ? 'Syncing...' : 'Sync Latest Docket'}
-              </button>
+              
+              {/* 4. Completely hide the Sync button if the user is an Associate */}
+              {role !== 'associate' && (
+                <button 
+                  onClick={handleSync} 
+                  disabled={isSyncing}
+                  className={`text-xs border border-neutral-700 px-4 py-2 uppercase tracking-wider transition-colors ${
+                    isSyncing ? 'bg-neutral-800 text-neutral-500 cursor-not-allowed' : 'hover:bg-white hover:text-black'
+                  }`}
+                >
+                  {isSyncing ? 'Syncing...' : 'Sync Latest Docket'}
+                </button>
+              )}
             </div>
           </div>
           
           <h2 className="hidden print:block text-lg font-bold mb-4 border-b border-black pb-2">Daily Cause List</h2>
 
           <div className="w-full border border-neutral-800 bg-[#080808] p-4 print:bg-white print:border-black print:p-0">
-            {isWeekend || extractedMatters.length === 0 ? (
+            {extractedMatters.length === 0 ? (
               <div className="w-full text-center py-12 text-sm text-neutral-500 font-medium tracking-wide">
                 No cases listed for today or tomorrow.
               </div>
@@ -142,9 +156,13 @@ export default function Dashboard() {
                         )}
                       </td>
                       <td className="p-4 align-top print:p-2">
+                        {/* 5. Disable the Assignment dropdown if the user is an Associate */}
                         <select 
                           defaultValue={matter.advocate_matched}
-                          className="w-full bg-black border border-neutral-700 text-neutral-300 p-2 text-xs focus:border-white focus:outline-none rounded-none appearance-none print:bg-white print:border-none print:text-black print:p-0"
+                          disabled={role === 'associate'}
+                          className={`w-full bg-black border border-neutral-700 text-neutral-300 p-2 text-xs focus:border-white focus:outline-none rounded-none appearance-none print:bg-white print:border-none print:text-black print:p-0 ${
+                            role === 'associate' ? 'opacity-50 cursor-not-allowed bg-neutral-900' : ''
+                          }`}
                         >
                           <option value="GAURAV MOHUNTA">Adv. Gaurav</option>
                           <option value="AKSHAY BHAN">Adv. Akshay</option>
@@ -163,7 +181,15 @@ export default function Dashboard() {
                         </select>
                       </td>
                       <td className="p-4 align-top print:p-2">
-                        <input type="text" placeholder="Add note..." className="w-full bg-black border border-neutral-700 text-neutral-300 p-2 text-xs focus:border-white focus:outline-none rounded-none print:bg-white print:border-none print:text-black print:p-0 print:placeholder-transparent" />
+                        {/* 6. Disable the Instruction notes field if the user is an Associate */}
+                        <input 
+                          type="text" 
+                          placeholder="Add note..." 
+                          disabled={role === 'associate'}
+                          className={`w-full bg-black border border-neutral-700 text-neutral-300 p-2 text-xs focus:border-white focus:outline-none rounded-none print:bg-white print:border-none print:text-black print:p-0 print:placeholder-transparent ${
+                            role === 'associate' ? 'opacity-50 cursor-not-allowed bg-neutral-900' : ''
+                          }`} 
+                        />
                       </td>
                     </tr>
                   ))}
