@@ -1,8 +1,7 @@
 'use client';
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, Suspense } from 'react';
 import Link from 'next/link';
 import { useSearchParams } from 'next/navigation';
-import dynamic from 'next/dynamic';
 import extractedMattersJson from './chamber_matters.json';
 
 type Matter = {
@@ -20,6 +19,7 @@ const extractedMatters = extractedMattersJson as Matter[];
 function DashboardContent() {
   const [isSyncing, setIsSyncing] = useState(false);
   const [currentDateTime, setCurrentDateTime] = useState('');
+  const [isWeekendBreak, setIsWeekendBreak] = useState(false);
   
   const searchParams = useSearchParams();
   const role = searchParams.get('role') || 'associate';
@@ -31,6 +31,16 @@ function DashboardContent() {
         weekday: 'long', year: 'numeric', month: 'long', day: 'numeric',
         hour: '2-digit', minute: '2-digit'
       }));
+
+      const day = now.getDay();
+      const hour = now.getHours();
+
+      // Hide cases on Saturday (6) and Sunday (0) before 6:00 PM (18)
+      if (day === 6 || (day === 0 && hour < 18)) {
+        setIsWeekendBreak(true);
+      } else {
+        setIsWeekendBreak(false);
+      }
     };
     updateTime();
     const interval = setInterval(updateTime, 60000);
@@ -117,7 +127,11 @@ function DashboardContent() {
           <h2 className="hidden print:block text-lg font-bold mb-4 border-b border-black pb-2">Daily Cause List</h2>
 
           <div className="w-full border border-neutral-800 bg-[#080808] p-4 print:bg-white print:border-black print:p-0">
-            {extractedMatters.length === 0 ? (
+            {isWeekendBreak ? (
+              <div className="w-full text-center py-12 text-sm text-neutral-500 font-medium tracking-wide">
+                No cases today. Court is closed for the weekend.
+              </div>
+            ) : extractedMatters.length === 0 ? (
               <div className="w-full text-center py-12 text-sm text-neutral-500 font-medium tracking-wide">
                 No cases listed for today or tomorrow.
               </div>
@@ -198,5 +212,10 @@ function DashboardContent() {
   );
 }
 
-// Disable SSR completely to safely bypass Vercel prerender errors
-export default dynamic(() => Promise.resolve(DashboardContent), { ssr: false });
+export default function Dashboard() {
+  return (
+    <Suspense fallback={<div className="min-h-screen bg-black text-white flex items-center justify-center font-sans">Loading Secure Dashboard...</div>}>
+      <DashboardContent />
+    </Suspense>
+  );
+}
