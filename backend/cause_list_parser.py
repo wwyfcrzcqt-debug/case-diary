@@ -138,7 +138,9 @@ def parse_and_filter_docket():
     court_pattern = re.compile(r'(?:C\.?R\.?\s*NO\.?|COURT\s*NO\.?|COURT\s*ROOM\s*NO\.?)\s*(\d+)')
     vc_pattern = re.compile(r'(https?://[^\s]*(?:zoom|webex|meet|highcourt)[^\s]*)', re.IGNORECASE)
     item_start_pattern = re.compile(r'^\s*(\d+[\*]*)\s+')
-    case_no_pattern = re.compile(r'([A-Za-z]+-\d+-\d{4})')
+    
+    # Upgraded regex to catch complex formats like CM-84-CWPIL-2023
+    case_no_pattern = re.compile(r'([A-Za-z]+[-A-Za-z0-9]+-\d{4})')
 
     with pdfplumber.open(TARGET_PDF) as pdf:
         for page in pdf.pages:
@@ -160,8 +162,13 @@ def parse_and_filter_docket():
                 item_match = item_start_pattern.search(line)
                 case_match = case_no_pattern.search(line)
                 
-                if item_match and case_match:
+                # Decoupled matching: item and case no longer need to be on the exact same line
+                if item_match:
                     active_item = item_match.group(1).replace('*', '')
+                    active_case = ""
+                    active_advocates_found = set()
+                    
+                if case_match:
                     active_case = case_match.group(1)
                     active_advocates_found = set()
                     
@@ -187,7 +194,3 @@ def parse_and_filter_docket():
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as outfile:
         json.dump(extracted_matters, outfile, indent=4)
-
-if __name__ == "__main__":
-    fetch_docket_and_roster()
-    parse_and_filter_docket()
