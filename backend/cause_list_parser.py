@@ -14,14 +14,12 @@ def get_target_date():
     ist = timezone(timedelta(hours=5, minutes=30))
     now = datetime.now(ist)
     
-    # If it is before 7:30 PM (19:30), fetch TODAY's list
     if now.hour < 19 or (now.hour == 19 and now.minute < 30):
         return now
         
-    # If it is 7:30 PM or later, calculate the NEXT working day
-    if now.weekday() == 4:  # Friday evening targets Monday
+    if now.weekday() == 4:
         days_to_add = 3
-    elif now.weekday() == 5:  # Saturday evening targets Monday
+    elif now.weekday() == 5:
         days_to_add = 2
     else:
         days_to_add = 1
@@ -35,10 +33,8 @@ def fetch_docket_and_roster():
         os.remove(TARGET_PDF)
         
     with sync_playwright() as p:
-        # STEP 3: headless=False forces the browser to open visibly on your Mac screen
         browser = p.chromium.launch(headless=False) 
         
-        # STEP 1: Aggressive User-Agent and Header spoofing to bypass bot detection
         context = browser.new_context(
             accept_downloads=True,
             user_agent="Mozilla/5.0 (Macintosh; Intel Mac OS X 10_15_7) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/120.0.0.0 Safari/537.36",
@@ -52,8 +48,6 @@ def fetch_docket_and_roster():
         
         try:
             print("Scraping live roster mapping...")
-            
-            # STEP 2: Retry loop for the Roster Page
             for attempt in range(3):
                 try:
                     page.goto("https://highcourtchd.gov.in/?mod=chief", wait_until="domcontentloaded", timeout=45000)
@@ -75,32 +69,27 @@ def fetch_docket_and_roster():
                         ROSTER_MAP[cr_match.group(1)] = judge_text
 
             print("Fetching target docket...")
-            
-            # STEP 2: Retry loop for the Cause List Page
             for attempt in range(3):
                 try:
                     page.goto("https://highcourtchd.gov.in/?mod=causelist", wait_until="domcontentloaded", timeout=45000)
                     break
                 except PlaywrightTimeoutError:
-                    print(f"Cause list load timeout. Retrying {attempt + 1}/3...")
-                    time.sleep(5)
+                        print(f"Cause list load timeout. Retrying {attempt + 1}/3...")
+                        time.sleep(5)
             else:
                 raise Exception("Failed to load High Court website after 3 attempts.")
             
             target_date_str = get_target_date().strftime('%d/%m/%Y')
             print(f"Targeting exact date: {target_date_str}")
             
-           # Type the date, then immediately hit Escape to close the blocking calendar
             page.locator("input[type='text']").first.fill(target_date_str)
             page.keyboard.press("Escape")
             
             page.locator("select").first.select_option(label="Complete List")
             
-            # Wait a brief moment for the calendar animation to disappear, then click
             page.wait_for_timeout(500) 
             page.get_by_role("button", name="View CL").click(force=True)
             
-            # STEP 2: Explicitly wait for the link to exist in the DOM before attempting to click it
             locator_string = f"a:has-text('{target_date_str}')"
             try:
                 print("Waiting for registry to return search results...")
@@ -113,19 +102,18 @@ def fetch_docket_and_roster():
                 print("PDF successfully saved.")
                 
             except PlaywrightTimeoutError:
-                # Fallback: Take a picture of what the bot is actually seeing
                 screenshot_path = "debug_timeout.png"
                 page.screenshot(path=screenshot_path)
                 print(f"\nCRITICAL ERROR: The date '{target_date_str}' did not appear on the screen.")
-                print(f"Saved a screenshot of the browser to {screenshot_path}.")
-                print("Check the image: If you see a CAPTCHA, you are blocked. If it says 'No Records Found', the registry hasn't published the docket yet.")
                 raise Exception("Target date link not found.")
             
         finally:
             browser.close()
 
 def parse_and_filter_docket():
+    print("Parsing PDF for chamber matters...")
     if not os.path.exists(TARGET_PDF):
+        print("No PDF found to parse.")
         return
 
     extracted_matters = []
@@ -137,9 +125,9 @@ def parse_and_filter_docket():
     
     court_pattern = re.compile(r'(?:C\.?R\.?\s*NO\.?|COURT\s*NO\.?|COURT\s*ROOM\s*NO\.?)\s*(\d+)')
     vc_pattern = re.compile(r'(https?://[^\s]*(?:zoom|webex|meet|highcourt)[^\s]*)', re.IGNORECASE)
-    item_start_pattern = re.compile(r'^\s*(\d+[\*]*)\s+')
     
-    # Upgraded regex to catch complex formats like CM-84-CWPIL-2023
+    # Cleaned up to grab just the numbers, ignoring asterisks and spaces
+    item_start_pattern = re.compile(r'^(\d+)\b')
     case_no_pattern = re.compile(r'([A-Za-z]+[-A-Za-z0-9]+-\d{4})')
 
     with pdfplumber.open(TARGET_PDF) as pdf:
@@ -149,22 +137,26 @@ def parse_and_filter_docket():
                 continue
             
             for line in text.split('\n'):
-                upper_line = line.upper()
+                # THE FIX: Collapse all multiple column spaces into a single space
+                normalized_line = " ".join(line.split())
+                if not normalized_line:
+                    continue
+                    
+                upper_line = normalized_line.upper()
                 
                 court_match = court_pattern.search(upper_line)
                 if court_match:
                     current_court_num = court_match.group(1).strip()
                     
-                vc_match = vc_pattern.search(line)
+                vc_match = vc_pattern.search(normalized_line)
                 if vc_match:
                     current_vc_link = vc_match.group(1).strip().rstrip('.,;)"\']')
                     
-                item_match = item_start_pattern.search(line)
-                case_match = case_no_pattern.search(line)
+                item_match = item_start_pattern.search(normalized_line)
+                case_match = case_no_pattern.search(normalized_line)
                 
-                # Decoupled matching: item and case no longer need to be on the exact same line
                 if item_match:
-                    active_item = item_match.group(1).replace('*', '')
+                    active_item = item_match.group(1)
                     active_case = ""
                     active_advocates_found = set()
                     
@@ -174,7 +166,8 @@ def parse_and_filter_docket():
                     
                 if active_case:
                     for adv in CHAMBER_ADVOCATES:
-                        if adv not in active_advocates_found and re.search(r'\b' + re.escape(adv) + r'\b', upper_line):
+                        # Simply check if the name exists in the sanitized line
+                        if adv not in active_advocates_found and adv in upper_line:
                             active_advocates_found.add(adv)
                             
                             verified_judge = ROSTER_MAP.get(current_court_num, "Judge TBD (Awaiting Roster)")
@@ -194,3 +187,5 @@ def parse_and_filter_docket():
     os.makedirs(os.path.dirname(output_path), exist_ok=True)
     with open(output_path, "w") as outfile:
         json.dump(extracted_matters, outfile, indent=4)
+        
+    print(f"Extraction complete: Found {len(extracted_matters)} cases.")
