@@ -133,7 +133,7 @@ function DashboardContent() {
               </div>
             ) : extractedMatters.length === 0 ? (
               <div className="w-full text-center py-12 text-sm text-neutral-500 font-medium tracking-wide">
-                No cases listed for today or tomorrow.
+                No cases listed for today.
               </div>
             ) : (
               <table className="w-full text-left text-sm print:text-black">
