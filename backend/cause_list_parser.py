@@ -125,8 +125,6 @@ def parse_and_filter_docket():
     
     court_pattern = re.compile(r'(?:C\.?R\.?\s*NO\.?|COURT\s*NO\.?|COURT\s*ROOM\s*NO\.?)\s*(\d+)')
     vc_pattern = re.compile(r'(https?://[^\s]*(?:zoom|webex|meet|highcourt)[^\s]*)', re.IGNORECASE)
-    
-    # Cleaned up to grab just the numbers, ignoring asterisks and spaces
     item_start_pattern = re.compile(r'^(\d+)\b')
     case_no_pattern = re.compile(r'([A-Za-z]+[-A-Za-z0-9]+-\d{4})')
 
@@ -137,7 +135,6 @@ def parse_and_filter_docket():
                 continue
             
             for line in text.split('\n'):
-                # THE FIX: Collapse all multiple column spaces into a single space
                 normalized_line = " ".join(line.split())
                 if not normalized_line:
                     continue
@@ -166,7 +163,6 @@ def parse_and_filter_docket():
                     
                 if active_case:
                     for adv in CHAMBER_ADVOCATES:
-                        # Simply check if the name exists in the sanitized line
                         if adv not in active_advocates_found and adv in upper_line:
                             active_advocates_found.add(adv)
                             
@@ -189,3 +185,7 @@ def parse_and_filter_docket():
         json.dump(extracted_matters, outfile, indent=4)
         
     print(f"Extraction complete: Found {len(extracted_matters)} cases.")
+
+if __name__ == "__main__":
+    fetch_docket_and_roster()
+    parse_and_filter_docket()
