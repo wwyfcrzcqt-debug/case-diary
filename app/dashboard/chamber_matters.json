@@ -1,209 +1,173 @@
 [
     {
-        "advocate_matched": "Akshay Bhan",
-        "item_no": "105",
-        "case_no": "CWP-19554-2020",
-        "judge": "Court Details Pending - Judge TBD (Awaiting Roster)",
-        "vc_link": "https://zoom.us/my/vcphhc04",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Ashish Kapoor",
+        "advocate_matched": "Gaurav Mohunta",
         "item_no": "102",
-        "case_no": "CWP-8255-1991",
-        "judge": "Court Details Pending - Judge TBD (Awaiting Roster)",
-        "vc_link": "https://zoom.us/my/vcphhc15",
+        "case_no": "CM-84-CWPIL-2023",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
         "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Ashish Kapoor",
-        "item_no": "102",
-        "case_no": "CWP-906-1990",
-        "judge": "Court Details Pending - Judge TBD (Awaiting Roster)",
-        "vc_link": "https://zoom.us/my/vcphhc15",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Ashish Kapoor",
-        "item_no": "104",
-        "case_no": "CWP-12808-1995",
-        "judge": "Court Details Pending - Judge TBD (Awaiting Roster)",
-        "vc_link": "https://zoom.us/my/vcphhc27",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Akshay Bhan",
-        "item_no": "143",
-        "case_no": "RSA-1944-2026",
-        "judge": "Court Details Pending - Judge TBD (Awaiting Roster)",
-        "vc_link": "https://zoom.us/my/vcphhc22",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
+        "date": "2026-10-09"
     },
     {
         "advocate_matched": "Gaurav Mohunta",
-        "item_no": "120",
-        "case_no": "CM-19890-CII-2026",
-        "judge": "Court Details Pending - Judge TBD (Awaiting Roster)",
-        "vc_link": "https://zoom.us/my/vcphhc68",
+        "item_no": "2025",
+        "case_no": "CM-7-CWPIL-2025",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
         "status": "Pending Assignment",
-        "date": "2026-10-08"
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "2026",
+        "case_no": "CM-4989",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "2024",
+        "case_no": "CM-1369",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "2024",
+        "case_no": "CM-1655",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "2024",
+        "case_no": "CM-1373",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "2024",
+        "case_no": "CM-2016",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "2025",
+        "case_no": "CM-1034",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "2025",
+        "case_no": "CM-1294",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Akshay Bhan",
+        "item_no": "109",
+        "case_no": "CWP-30099-2026",
+        "judge": "CR NO 36 - HON'BLE MR. JUSTICE HARPREET SINGH BRAR",
+        "vc_link": "https://zoom.us/my/vcphhc36",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "206",
+        "case_no": "CWP-13932-2016",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Gaurav Mohunta",
+        "item_no": "2018",
+        "case_no": "CM-15897-CWP-2022",
+        "judge": "CR NO 1 - HON'BLE MR. JUSTICE ASHWANI KUMAR MISHRA, CHIEF JUSTICE",
+        "vc_link": "https://zoom.us/my/vcphhc01",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Akshay Bhan",
+        "item_no": "210",
+        "case_no": "CR-3276-2019",
+        "judge": "CR NO 29 - HON'BLE MR. JUSTICE VIKAS SURI",
+        "vc_link": "https://zoom.us/my/vcphhc29",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
     },
     {
         "advocate_matched": "Ashish Kapoor",
-        "item_no": "102",
-        "case_no": "RSA-1649-1995",
-        "judge": "Court Details Pending - Judge TBD (Awaiting Roster)",
+        "item_no": "206",
+        "case_no": "RFA-3821-1998",
+        "judge": "CR NO 38 - HON'BLE MR. JUSTICE JAGMOHAN BANSAL",
+        "vc_link": "https://zoom.us/my/vcphhc38",
+        "status": "Pending Assignment",
+        "date": "2026-10-09"
+    },
+    {
+        "advocate_matched": "Ashish Kapoor",
+        "item_no": "207",
+        "case_no": "RSA-3514-2000",
+        "judge": "CR NO 33 - HON'BLE MR. JUSTICE YASHVIR SINGH RATHOR",
         "vc_link": "https://zoom.us/my/vcphhc33",
         "status": "Pending Assignment",
-        "date": "2026-10-08"
+        "date": "2026-10-09"
     },
     {
         "advocate_matched": "Ashish Kapoor",
-        "item_no": "102",
-        "case_no": "RSA-2452-1995",
-        "judge": "Court Details Pending - Judge TBD (Awaiting Roster)",
+        "item_no": "207",
+        "case_no": "CM-4935-C-2011",
+        "judge": "CR NO 33 - HON'BLE MR. JUSTICE YASHVIR SINGH RATHOR",
         "vc_link": "https://zoom.us/my/vcphhc33",
         "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Gaurav Mohunta",
-        "item_no": "419",
-        "case_no": "CRA-S-1491-SB-2006",
-        "judge": "CR NO 48 - HON'BLE MS. JUSTICE NEERJA K. KALSON",
-        "vc_link": "https://zoom.us/my/vcphhc42",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Gaurav Mohunta",
-        "item_no": "209",
-        "case_no": "LPA-81-2022",
-        "judge": "CR NO 2 - HON'BLE MR. JUSTICE DEEPAK SIBAL",
-        "vc_link": "https://zoom.us/my/vcphhc02",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Gaurav Mohunta",
-        "item_no": "209",
-        "case_no": "RA-CW-141-2021",
-        "judge": "CR NO 2 - HON'BLE MR. JUSTICE DEEPAK SIBAL",
-        "vc_link": "https://zoom.us/my/vcphhc02",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Gaurav Mohunta",
-        "item_no": "233",
-        "case_no": "CRA-D-339-2025",
-        "judge": "CR NO 5 - HON'BLE MR. JUSTICE ANOOP CHITKARA",
-        "vc_link": "https://zoom.us/my/vcphhc05",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
+        "date": "2026-10-09"
     },
     {
         "advocate_matched": "Ashish Kapoor",
-        "item_no": "232",
-        "case_no": "CWP-18957-2025",
-        "judge": "CR NO 6 - HON'BLE MRS. JUSTICE ALKA SARIN",
-        "vc_link": "https://zoom.us/my/vcphhc52",
+        "item_no": "207",
+        "case_no": "CM-4940-C-2011",
+        "judge": "CR NO 33 - HON'BLE MR. JUSTICE YASHVIR SINGH RATHOR",
+        "vc_link": "https://zoom.us/my/vcphhc33",
         "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Ashish Kapoor",
-        "item_no": "244",
-        "case_no": "CWP-33772-2025",
-        "judge": "CR NO 6 - HON'BLE MRS. JUSTICE ALKA SARIN",
-        "vc_link": "https://zoom.us/my/vcphhc15",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
+        "date": "2026-10-09"
     },
     {
         "advocate_matched": "Akshay Bhan",
-        "item_no": "265",
-        "case_no": "CWP-10938-2023",
-        "judge": "CR NO 6 - HON'BLE MRS. JUSTICE ALKA SARIN",
-        "vc_link": "https://zoom.us/my/vcphhc15",
+        "item_no": "2025",
+        "case_no": "CWP-15877-2013",
+        "judge": "CR NO 7 - HON'BLE MR. JUSTICE JASGURPREET SINGH PURI",
+        "vc_link": "https://zoom.us/my/vcphhc07",
         "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Akshay Bhan",
-        "item_no": "202",
-        "case_no": "CWP-1385-2022",
-        "judge": "CR NO 6 - HON'BLE MRS. JUSTICE ALKA SARIN",
-        "vc_link": "https://zoom.us/my/vcphhc62",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Ashish Kapoor",
-        "item_no": "289",
-        "case_no": "CWP-3084-1998",
-        "judge": "CR NO 27 - HON'BLE MR. JUSTICE PANKAJ JAIN",
-        "vc_link": "https://zoom.us/my/vcphhc27",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Akshay Bhan",
-        "item_no": "208",
-        "case_no": "CWP-18526-2021",
-        "judge": "CR NO 25 - HON'BLE MS JUSTICE LAPITA BANERJI",
-        "vc_link": "https://zoom.us/my/vcphhc25",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Akshay Bhan",
-        "item_no": "282",
-        "case_no": "RSA-1424-2024",
-        "judge": "CR NO 20 - HON'BLE MR. JUSTICE DEEPAK MANCHANDA",
-        "vc_link": "https://zoom.us/my/vcphhc20",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
+        "date": "2026-10-09"
     },
     {
         "advocate_matched": "Gaurav Mohunta",
-        "item_no": "224",
-        "case_no": "CWP-6006-2020",
-        "judge": "CR NO 34 - HON'BLE MRS. JUSTICE SUDEEPTI SHARMA",
-        "vc_link": "https://zoom.us/my/vcphhc34",
+        "item_no": "503",
+        "case_no": "CWP-9764-2006",
+        "judge": "CR NO 23 - HON'BLE MR. JUSTICE DEEPINDER SINGH NALWA",
+        "vc_link": "https://zoom.us/my/vcphhc23",
         "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Gaurav Mohunta",
-        "item_no": "201",
-        "case_no": "CM-10576-C-2024",
-        "judge": "CR NO 68 - HON'BLE MR. JUSTICE SUBHAS MEHLA",
-        "vc_link": "https://zoom.us/my/vcphhc68",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Akshay Bhan",
-        "item_no": "202",
-        "case_no": "RSA-1592-2008",
-        "judge": "CR NO 16 - HON'BLE MS. JUSTICE MONICA CHHIBBER SHARMA",
-        "vc_link": "https://zoom.us/my/vcphhc16",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
-    },
-    {
-        "advocate_matched": "Akshay Bhan",
-        "item_no": "23",
-        "case_no": "FAO-COM-17-2024",
-        "judge": "CR NO 4 - HON'BLE MR. JUSTICE SUVIR SEHGAL",
-        "vc_link": "https://zoom.us/my/vcphhc04",
-        "status": "Pending Assignment",
-        "date": "2026-10-08"
+        "date": "2026-10-09"
     }
 ]
